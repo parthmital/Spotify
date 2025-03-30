@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Redirecting to Spotify</title>
+    <script>
+        // Handle three types of URLs:
+        // 1. Direct file requests (/Images/cover.jpg)
+        // 2. React Router paths (/playlist/123)
+        // 3. Genuine 404s
+
+        const path = window.location.pathname;
+        const base = '/Spotify';
+
+        // Check if this is a request for static assets
+        if (path.includes('/Images/') || path.includes('/Songs/') || path.includes('/static/')) {
+            // Redirect to the correct asset path
+            window.location.href = base + path;
+        } else {
+            // Store the original URL for React Router
+            sessionStorage.setItem('redirectPath', path);
+            // Redirect to the app's index
+            window.location.replace(base + '/');
+        }
+    </script>
+    <noscript>
+        <meta http-equiv="refresh" content="0; url=/Spotify/">
+    </noscript>
+</head>
+
+<body>
+    <p>Redirecting to <a href="/Spotify/">Spotify app</a>...</p>
+</body>
+
+</html>
