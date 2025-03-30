@@ -1,5 +1,8 @@
 export const CONFIG = {
-    paths: { images: 'Images/', songs: 'Songs/' },
+    paths: {
+        images: "/Spotify/Images/",
+        songs: "/Spotify/Songs/"
+    },
     defaultHue: 145
 };
 
@@ -12,9 +15,10 @@ export const createPlaylistData = (name, info, coverIndex) => ({
 export const createTrackData = (song, artist, coverFile) => {
     const fileName = song.includes(" - ") ? song : `${artist.split(',')[0]} - ${song}`;
     return {
-        song, artist,
-        cover: `${CONFIG.paths.images}${coverFile}`,
-        file: `${CONFIG.paths.songs}${fileName}.flac`
+        song,
+        artist,
+        cover: `${CONFIG.paths.images}${encodeURIComponent(coverFile)}`,
+        file: `${CONFIG.paths.songs}${encodeURIComponent(fileName)}.mp3`
     };
 };
 
