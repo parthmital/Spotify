@@ -1,7 +1,7 @@
 export const CONFIG = {
     paths: {
-        images: "/Spotify/Images/",
-        songs: "/Spotify/Songs/"
+        images: process.env.PUBLIC_URL + '/Images/',
+        songs: process.env.PUBLIC_URL + '/Songs/'
     },
     defaultHue: 145
 };
