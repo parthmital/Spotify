@@ -30,14 +30,14 @@ body {
 
 .text-primary {
   color: var(--white);
-  font-family: "Spotify Mix";
+  font-family: "Spotify Mix UI";
   font-weight: 400;
   letter-spacing: 0.36px;
 }
 
 .text-secondary {
   color: var(--grey);
-  font-family: "Spotify Mix";
+  font-family: "Spotify Mix UI";
   font-weight: 400;
   letter-spacing: 0.36px;
 }
@@ -101,7 +101,7 @@ body {
   background: none;
   flex: 1 0 0;
   color: var(--white);
-  font-family: "Spotify Mix";
+  font-family: "Spotify Mix UI";
   font-size: 14px;
   font-weight: 400;
   letter-spacing: 0.36px;
@@ -141,7 +141,7 @@ body {
   background: var(--bg-light);
   color: var(--white);
   text-align: center;
-  font-family: "Spotify Mix";
+  font-family: "Spotify Mix UI";
   font-size: 12px;
   font-weight: 400;
   letter-spacing: 0.36px;
@@ -221,7 +221,7 @@ body {
   align-self: stretch;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: "Spotify Mix";
+  font-family: "Spotify Mix UI";
   font-size: 14px;
   font-weight: 400;
   line-height: normal;
@@ -240,7 +240,7 @@ body {
   align-self: stretch;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: "Spotify Mix";
+  font-family: "Spotify Mix UI";
   font-size: 12px;
   font-weight: 400;
   line-height: normal;
@@ -334,7 +334,7 @@ body {
   align-items: center;
   align-self: stretch;
   color: var(--white);
-  font-family: "Spotify Mix";
+  font-family: "Spotify Mix UI";
   font-size: 20px;
   font-weight: 400;
   letter-spacing: 0.36px;
@@ -412,7 +412,7 @@ body {
   overflow: hidden;
   color: var(--white);
   text-overflow: ellipsis;
-  font-family: "Spotify Mix";
+  font-family: "Spotify Mix UI";
   font-size: 14px;
   font-weight: 400;
   letter-spacing: 0.36px;
@@ -421,7 +421,7 @@ body {
 .PlaylistInfo {
   align-self: stretch;
   color: var(--grey);
-  font-family: "Spotify Mix";
+  font-family: "Spotify Mix UI";
   font-size: 12px;
   font-weight: 400;
   letter-spacing: 0.36px;
@@ -461,7 +461,7 @@ body {
 .Duration {
   color: var(--white);
   text-align: center;
-  font-family: "Spotify Mix";
+  font-family: "Spotify Mix UI";
   font-size: 14px;
   font-weight: 400;
   letter-spacing: 0.36px;
@@ -530,7 +530,7 @@ body {
   align-self: stretch;
   color: var(--white);
   text-align: center;
-  font-family: "Spotify Mix";
+  font-family: "Spotify Mix UI";
   font-size: 12px;
   font-weight: 400;
   letter-spacing: 0.36px;
