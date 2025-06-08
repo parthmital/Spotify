@@ -1,8 +1,7 @@
-/* Spotify Mix Font Family with absolute paths for GitHub Pages */
 @font-face {
     font-family: 'Spotify Mix';
-    src: url('/fonts/SpotifyMix-Regular.woff2') format('woff2'),
-        url('/fonts/SpotifyMix-Regular.woff') format('woff');
+    src: url('./SpotifyMix-Regular.woff2') format('woff2'),
+        url('./SpotifyMix-Regular.woff') format('woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -10,8 +9,8 @@
 
 @font-face {
     font-family: 'Spotify Mix';
-    src: url('/fonts/SpotifyMix-Light.woff2') format('woff2'),
-        url('/fonts/SpotifyMix-Light.woff') format('woff');
+    src: url('./SpotifyMix-Light.woff2') format('woff2'),
+        url('./SpotifyMix-Light.woff') format('woff');
     font-weight: 300;
     font-style: normal;
     font-display: swap;
@@ -19,8 +18,8 @@
 
 @font-face {
     font-family: 'Spotify Mix';
-    src: url('/fonts/SpotifyMix-Bold.woff2') format('woff2'),
-        url('/fonts/SpotifyMix-Bold.woff') format('woff');
+    src: url('./SpotifyMix-Bold.woff2') format('woff2'),
+        url('./SpotifyMix-Bold.woff') format('woff');
     font-weight: bold;
     font-style: normal;
     font-display: swap;
@@ -28,8 +27,8 @@
 
 @font-face {
     font-family: 'Spotify Mix';
-    src: url('/fonts/SpotifyMix-Medium.woff2') format('woff2'),
-        url('/fonts/SpotifyMix-Medium.woff') format('woff');
+    src: url('./SpotifyMix-Medium.woff2') format('woff2'),
+        url('./SpotifyMix-Medium.woff') format('woff');
     font-weight: 500;
     font-style: normal;
     font-display: swap;
@@ -37,8 +36,8 @@
 
 @font-face {
     font-family: 'Spotify Mix';
-    src: url('/fonts/SpotifyMix-Black.woff2') format('woff2'),
-        url('/fonts/SpotifyMix-Black.woff') format('woff');
+    src: url('./SpotifyMix-Black.woff2') format('woff2'),
+        url('./SpotifyMix-Black.woff') format('woff');
     font-weight: 900;
     font-style: normal;
     font-display: swap;
@@ -47,8 +46,8 @@
 /* Italic variants */
 @font-face {
     font-family: 'Spotify Mix';
-    src: url('/fonts/SpotifyMix-Italic.woff2') format('woff2'),
-        url('/fonts/SpotifyMix-Italic.woff') format('woff');
+    src: url('./SpotifyMix-Italic.woff2') format('woff2'),
+        url('./SpotifyMix-Italic.woff') format('woff');
     font-weight: normal;
     font-style: italic;
     font-display: swap;
@@ -56,8 +55,8 @@
 
 @font-face {
     font-family: 'Spotify Mix';
-    src: url('/fonts/SpotifyMix-BoldItalic.woff2') format('woff2'),
-        url('/fonts/SpotifyMix-BoldItalic.woff') format('woff');
+    src: url('./SpotifyMix-BoldItalic.woff2') format('woff2'),
+        url('./SpotifyMix-BoldItalic.woff') format('woff');
     font-weight: bold;
     font-style: italic;
     font-display: swap;
@@ -66,8 +65,8 @@
 /* Ultra family */
 @font-face {
     font-family: 'Spotify Mix Ultra';
-    src: url('/fonts/SpotifyMix-Ultra.woff2') format('woff2'),
-        url('/fonts/SpotifyMix-Ultra.woff') format('woff');
+    src: url('./SpotifyMix-Ultra.woff2') format('woff2'),
+        url('./SpotifyMix-Ultra.woff') format('woff');
     font-weight: 900;
     font-style: normal;
     font-display: swap;
@@ -75,8 +74,8 @@
 
 @font-face {
     font-family: 'Spotify Mix Ultra';
-    src: url('/fonts/SpotifyMix-UltraItalic.woff2') format('woff2'),
-        url('/fonts/SpotifyMix-UltraItalic.woff') format('woff');
+    src: url('./SpotifyMix-UltraItalic.woff2') format('woff2'),
+        url('./SpotifyMix-UltraItalic.woff') format('woff');
     font-weight: 900;
     font-style: italic;
     font-display: swap;
