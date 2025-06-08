@@ -1,6 +1,39 @@
+:root {
+    /* Colors */
+    --color-bg-primary: #121212;
+    --color-fg-primary: #fff;
+    --color-fg-secondary: rgba(224, 224, 224, 0.50);
+    --color-accent: #1ed760;
+    --color-error: #e91429;
+    --color-border: rgba(255, 255, 255, 0.3);
+    --color-hover-bg: rgba(255, 255, 255, 0.1);
+
+    /* Fonts */
+    --font-primary: "Spotify Mix";
+
+    /* Font sizes */
+    --font-size-heading: 32px;
+    --font-size-body: 14px;
+
+    /* Spacing */
+    --spacing-small: 4px;
+    --spacing-medium: 12px;
+    --spacing-large: 16px;
+    --spacing-xlarge: 24px;
+    --spacing-xxlarge: 32px;
+
+    /* Borders */
+    --border-radius-small: 5px;
+    --border-radius-large: 25px;
+    --border-width: 1px;
+
+    /* Transitions */
+    --transition-fast: 0.2s;
+}
+
 body {
-    background: #121212;
-    font-family: "Spotify Mix UI", sans-serif;
+    background: var(--color-bg-primary);
+    font-family: var(--font-primary);
     min-height: 100vh;
     margin: 0;
 }
@@ -11,10 +44,10 @@ body {
     box-sizing: border-box;
     margin: auto;
     display: flex;
-    padding: 16px;
+    padding: var(--spacing-large);
     flex-direction: column;
     align-items: center;
-    gap: 32px;
+    gap: var(--spacing-xxlarge);
 }
 
 .Header,
@@ -24,16 +57,16 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 4px;
+    gap: var(--spacing-small);
     align-self: stretch;
 }
 
 .HeadingText {
     align-self: stretch;
-    color: var(--Fg-Primary, #fff);
+    color: var(--color-fg-primary);
     text-align: center;
-    font-family: "Spotify Mix UI";
-    font-size: 32px;
+    font-family: var(--font-primary);
+    font-size: var(--font-size-heading);
     font-style: normal;
     font-weight: 700;
     line-height: normal;
@@ -42,7 +75,7 @@ body {
 
 .Middle,
 .Footer {
-    gap: 16px;
+    gap: var(--spacing-large);
 }
 
 .TextBold {
@@ -52,10 +85,10 @@ body {
     -webkit-line-clamp: 1;
     align-self: stretch;
     overflow: hidden;
-    color: var(--Fg-Primary, #fff);
+    color: var(--color-fg-primary);
     text-overflow: ellipsis;
-    font-family: "Spotify Mix UI";
-    font-size: 14px;
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
     font-style: normal;
     font-weight: 700;
     line-height: normal;
@@ -64,17 +97,17 @@ body {
 
 .Form {
     display: flex;
-    padding: 12px;
+    padding: var(--spacing-medium);
     align-items: center;
-    gap: 12px;
+    gap: var(--spacing-medium);
     align-self: stretch;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--border-radius-small);
+    border: var(--border-width) solid var(--color-border);
 }
 
 .Form:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transition: 0.2s;
+    background: var(--color-hover-bg);
+    transition: var(--transition-fast);
 }
 
 .FormInput {
@@ -85,10 +118,10 @@ body {
     -webkit-line-clamp: 1;
     flex: 1 0 0;
     overflow: hidden;
-    color: white;
+    color: var(--color-fg-primary);
     text-overflow: ellipsis;
-    font-family: "Spotify Mix UI";
-    font-size: 14px;
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
     font-style: normal;
     font-weight: 400;
     line-height: normal;
@@ -104,10 +137,10 @@ body {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
     overflow: hidden;
-    color: rgba(224, 224, 224, 0.50);
+    color: var(--color-fg-secondary);
     text-overflow: ellipsis;
-    font-family: "Spotify Mix UI";
-    font-size: 14px;
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
     font-style: normal;
     font-weight: 400;
     line-height: normal;
@@ -116,16 +149,16 @@ body {
 
 .GreenButton {
     display: flex;
-    padding: 12px 24px;
+    padding: var(--spacing-medium) var(--spacing-xlarge);
     justify-content: center;
     align-items: center;
-    gap: 12px;
+    gap: var(--spacing-medium);
     align-self: stretch;
-    border-radius: 25px;
-    background: #1ed760;
+    border-radius: var(--border-radius-large);
+    background: var(--color-accent);
     border: none;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform var(--transition-fast);
 }
 
 .GreenButton .TextBold {
@@ -134,16 +167,16 @@ body {
 
 .Button {
     display: flex;
-    padding: 12px 24px;
+    padding: var(--spacing-medium) var(--spacing-xlarge);
     justify-content: center;
     align-items: center;
-    gap: 12px;
+    gap: var(--spacing-medium);
     align-self: stretch;
-    border-radius: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--border-radius-large);
+    border: var(--border-width) solid var(--color-border);
     background: transparent;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform var(--transition-fast);
 }
 
 .FooterText {
@@ -151,7 +184,7 @@ body {
     justify-content: center;
     align-items: center;
     align-content: center;
-    gap: 4px;
+    gap: var(--spacing-small);
     align-self: stretch;
     flex-wrap: wrap;
 }
@@ -167,11 +200,11 @@ body {
 }
 
 .Button:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--color-hover-bg);
 }
 
 .TextBold[style*="color: #1ed760"] {
-    color: #1ed760 !important;
+    color: var(--color-accent) !important;
     cursor: pointer;
 }
 
@@ -180,7 +213,7 @@ body {
 }
 
 .FooterText .TextBold {
-    color: #1ed760;
+    color: var(--color-accent);
     cursor: pointer;
 }
 
@@ -190,9 +223,9 @@ body {
 
 .ErrorMessage {
     display: none;
-    color: #e91429;
-    font-family: "Spotify Mix UI";
-    font-size: 14px;
+    color: var(--color-error);
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
     font-style: normal;
     font-weight: 400;
     line-height: normal;
@@ -200,14 +233,14 @@ body {
 }
 
 .FormError {
-    border-color: #e91429 !important;
+    border-color: var(--color-error) !important;
 }
 
 .Form:focus-within {
-    border-color: #ffffff !important;
+    border-color: var(--color-fg-primary) !important;
 }
 
 .FormInput::placeholder {
-    color: rgba(224, 224, 224, 0.5);
+    color: var(--color-fg-secondary);
     opacity: 1;
 }
