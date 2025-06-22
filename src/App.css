@@ -1,0 +1,680 @@
+:root {
+  /* Color Variables */
+  --accent-color: #1ed760;
+  --white: #fff;
+  --grey: #b3b3b3;
+  --bg-hover: rgba(255, 255, 255, 0.2);
+  --bg-light: rgba(255, 255, 255, 0.1);
+  --bg-lighter: rgba(255, 255, 255, 0.05);
+  --black: #000;
+  --black-transparent: rgba(0, 0, 0, 0.95);
+  --gray-medium: rgba(137, 137, 137, 0.5);
+  --transparent: rgba(0, 0, 0, 0);
+
+  /* Font Variables */
+  --font-family-primary: "Spotify Mix";
+  --font-weight-normal: 400;
+  --letter-spacing-normal: 0.36px;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 20px;
+
+  /* Spacing Variables */
+  --space-xxs: 6px;
+  --space-xs: 8px;
+  --space-sm: 10px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-xxl: 28px;
+  --space-xxxl: 32px;
+  --space-xxxxl: 38px;
+
+  /* Size Variables */
+  --size-icon-sm: 15px;
+  --size-playhead: 12px;
+  --size-cover-sm: 43px;
+  --size-cover-md: 141.06px;
+  --size-playlist-width: 150px;
+  --size-playlist-height: 200px;
+  --size-progress-height: 4px;
+  --size-progress-hover-height: 6px;
+  --size-player-bottom: 148.8px;
+
+  /* Border Variables */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-circle: 100%;
+
+  /* Opacity Variables */
+  --opacity-hidden: 0;
+  --opacity-visible: 1;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, var(--black) 100%),
+    linear-gradient(0deg, var(--accent-color) 0%, var(--accent-color) 100%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-primary {
+  color: var(--white);
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.text-secondary {
+  color: var(--grey);
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.HomePage {
+  padding-bottom: var(--size-player-bottom);
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.Top,
+.Middle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1 0 0;
+  align-self: stretch;
+}
+
+.TopTop {
+  display: flex;
+  padding: var(--space-lg);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-lg);
+  align-self: stretch;
+}
+
+.Middle {
+  padding: 0 var(--space-lg);
+  gap: var(--space-xs);
+}
+
+.SearchBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  border-radius: var(--radius-lg);
+  background: var(--bg-lighter);
+}
+
+.SearchBar:focus-within {
+  outline: 1px solid var(--accent-color);
+}
+
+.SearchBar:hover {
+  background: var(--bg-hover);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.SearchInput {
+  padding: var(--space-md) var(--space-xs);
+  border-radius: var(--radius-lg);
+  border: none;
+  background: none;
+  flex: 1 0 0;
+  color: var(--white);
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.SearchInput:focus {
+  outline: none;
+}
+
+.SearchIconFrame {
+  display: flex;
+  padding: 0 var(--space-md);
+  justify-content: center;
+  align-items: center;
+}
+
+.FilterFrame {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+
+.Filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.FilterButton {
+  border: none;
+  display: flex;
+  padding: var(--space-xs);
+  align-items: center;
+  gap: var(--space-xxxxl);
+  border-radius: var(--radius-lg);
+  background: var(--bg-light);
+  color: var(--white);
+  text-align: center;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.FilterButton:hover {
+  background: var(--bg-hover);
+  color: var(--accent-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.LibraryIconFrame {
+  display: flex;
+  padding: 0 var(--space-md) 0 var(--space-sm);
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.RecentlyPlayed {
+  overflow-x: scroll;
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  align-self: stretch;
+}
+
+.Album {
+  display: flex;
+  min-width: 200px;
+  padding: var(--space-xs);
+  align-items: center;
+  gap: var(--space-xs);
+  border-radius: var(--radius-lg);
+  background: var(--bg-light);
+}
+
+.Album:hover {
+  background: var(--bg-hover);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.AlbumCover,
+.SongCover {
+  width: var(--size-cover-sm);
+  height: var(--size-cover-sm);
+  border-radius: var(--radius-sm);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: var(--white);
+}
+
+.AlbumDescription,
+.SongDetail {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  flex: 1 0 0;
+}
+
+.AlbumName,
+.SongName {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  align-self: stretch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: normal;
+  letter-spacing: var(--letter-spacing-normal);
+  background: linear-gradient(90deg, var(--white) 50%, var(--transparent) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.AlbumArtist,
+.SongArtist {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  align-self: stretch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  line-height: normal;
+  letter-spacing: var(--letter-spacing-normal);
+  background: linear-gradient(90deg, var(--grey) 50%, var(--transparent) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.PlayButton,
+.PlayButton2,
+.PlayButton3,
+.PauseButton {
+  display: flex;
+  padding: var(--space-sm);
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  border-radius: var(--radius-circle);
+  background: var(--accent-color);
+}
+
+.PlayButton:hover,
+.PlayButton2:hover,
+.PlayButton3:hover,
+.PauseButton:hover {
+  cursor: pointer;
+}
+
+.PlayButton,
+.PlayButton2 {
+  opacity: var(--opacity-hidden);
+  transition: opacity 0.2s ease;
+}
+
+.Album .PauseButton {
+  opacity: var(--opacity-hidden);
+  transition: opacity 0.2s ease;
+}
+
+.Player .PauseButton {
+  opacity: var(--opacity-visible);
+  display: flex;
+}
+
+.PlayButton2 {
+  position: absolute;
+  bottom: var(--space-sm);
+  right: var(--space-sm);
+}
+
+.PlayButton svg,
+.PlayButton2 svg,
+.PlayButton3 svg,
+.PauseButton svg {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  fill: var(--black);
+}
+
+.Album:not(.playing) .PauseButton {
+  display: none;
+}
+
+.Album.playing .PlayButton {
+  display: none;
+}
+
+.Album.playing .PauseButton {
+  display: flex;
+  opacity: var(--opacity-visible);
+}
+
+.Album:hover .PlayButton,
+.Album.playing:hover .PauseButton {
+  opacity: var(--opacity-visible);
+}
+
+.PlaylistType {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  align-self: stretch;
+}
+
+.MadeForYouFrame {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  color: var(--white);
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.InfoIconFrame {
+  display: flex;
+  padding: 0 var(--space-md);
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.Playlists {
+  overflow-x: scroll;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-lg);
+  align-self: stretch;
+}
+
+.Playlist {
+  padding: var(--space-xs);
+  border-radius: var(--radius-lg);
+  width: var(--size-playlist-width);
+  height: var(--size-playlist-height);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xxs);
+  background: var(--bg-light);
+}
+
+.Playlist:hover {
+  background: var(--bg-hover);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.Playlist:hover .PlayButton2 {
+  opacity: var(--opacity-visible);
+}
+
+.PlaylistCover {
+  position: relative;
+  width: var(--size-cover-md);
+  height: var(--size-cover-md);
+  border-radius: var(--radius-md);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: var(--white);
+}
+
+.PlaylistDescription {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+}
+
+.PlaylistName {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  align-self: stretch;
+  overflow: hidden;
+  color: var(--white);
+  text-overflow: ellipsis;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.PlaylistInfo {
+  align-self: stretch;
+  color: var(--grey);
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.Bottom {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+}
+
+.PlayerFrame {
+  display: flex;
+  padding: 0 var(--space-xxl);
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+
+.Player.Desktop {
+  display: flex;
+  padding: var(--space-xs) var(--space-lg) var(--space-xs) var(--space-xs);
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-lg);
+  flex: 1 0 0;
+  border-radius: var(--radius-lg);
+  background: var(--black-transparent);
+}
+
+.CurrentTime,
+.Duration {
+  color: var(--white);
+  text-align: center;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.PlayBar {
+  height: var(--size-progress-height);
+  flex: 1 0 0;
+  background: var(--gray-medium);
+  border-radius: var(--radius-xs);
+  position: relative;
+  cursor: pointer;
+  margin: 0 var(--space-xs);
+}
+
+.PlayBar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: var(--progress, 0%);
+  background: var(--accent-color);
+  border-radius: var(--radius-xs);
+  transition: width 0.1s linear;
+}
+
+.PlayBar::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: var(--progress, 0%);
+  transform: translate(-50%, -50%);
+  width: var(--size-playhead);
+  height: var(--size-playhead);
+  background: var(--accent-color);
+  border-radius: var(--radius-circle);
+  opacity: var(--playhead-opacity, var(--opacity-hidden));
+  transition: opacity 0.2s ease;
+}
+
+.PlayBar:hover::before {
+  background: var(--accent-color);
+}
+
+.PlayBar:hover::after {
+  opacity: var(--opacity-visible);
+}
+
+.PlayBar:hover {
+  height: var(--size-progress-hover-height);
+  margin-top: -1px;
+}
+
+.Song {
+  display: flex;
+  width: var(--size-playlist-width);
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.Buttons {
+  display: flex;
+  padding: var(--space-md) var(--space-xxxl);
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-xxxl);
+  align-self: stretch;
+  background: var(--black);
+}
+
+.NavBarButtons {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  color: var(--white);
+  text-align: center;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.NavBarButtons:hover {
+  color: var(--accent-color);
+  cursor: pointer;
+}
+
+.NavBarButtons:hover path {
+  fill: var(--accent-color);
+  transition: fill 0.2s;
+}
+
+svg:not(.PlayButton svg, .PlayButton2 svg, .PlayButton3 svg, .PauseButton svg, .NavBarButtons svg, .HueSliderButton svg):hover {
+  fill: var(--accent-color);
+  stroke: var(--accent-color);
+  transform: scale(1.1);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.FilterButton:active,
+.PlayButton:active,
+.PlayButton2:active,
+.PlayButton3:active,
+.PauseButton:active,
+.Album:active,
+.Playlist:active,
+.NavBarButtons:active,
+.HueSliderButton:active,
+svg:active {
+  transform: scale(0.95);
+  transition: transform 0.2s;
+}
+
+.HueSliderButton {
+  display: flex;
+  padding: var(--space-xs);
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-circle);
+  background: var(--bg-light);
+  cursor: pointer;
+}
+
+.HueSliderButton:hover {
+  background: var(--bg-hover);
+  transform: scale(1.1);
+}
+
+.HueSliderButton:hover svg path {
+  stroke: var(--accent-color);
+}
+
+.Player.Mobile {
+  display: none;
+}
+
+@media (max-width: 750px) {
+  .Player.Desktop {
+    display: none;
+  }
+
+  .Player.Mobile {
+    width: 100%;
+    display: flex;
+    padding: var(--space-xs);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-xs);
+    flex: 1 0 0;
+    border-radius: var(--radius-lg);
+    background: var(--black-transparent);
+  }
+
+  .Player.Mobile .PauseButton {
+    opacity: var(--opacity-visible);
+    display: flex;
+  }
+
+  .PlayerTop {
+    display: flex;
+    padding-right: var(--space-md);
+    align-items: center;
+    gap: var(--space-lg);
+    align-self: stretch;
+  }
+
+  .Song {
+    justify-content: center;
+    flex: 1 0 0;
+  }
+
+  .SongDetail {
+    align-items: center;
+  }
+
+  .PlayerRight {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+}
