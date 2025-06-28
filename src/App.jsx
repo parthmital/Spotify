@@ -1,58 +1,43 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
-import { CONFIG } from '@/constants/config';
 import Album from '@/components/Album';
 import Playlist from '@/components/Playlist';
 import PlayBar from '@/components/PlayBar';
+import SearchResults from '@/components/SearchResults';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { useMusicData } from '@/hooks/useMusicData';
+
 function App() {
-  const sanitize = str => str.replace(/[^a-z0-9\- ]/gi, '').trim();
-  const createPlaylistData = (name, info, coverIndex) => ({
-    name,
-    info,
-    cover: `${CONFIG.paths.images}${coverIndex}.jpeg`
-  });
-  const createTrackData = (song, artist, coverFile) => {
-    const fileName = song.includes(" - ") ? song : `${artist.split(',')[0]} - ${song}`;
-    const safeFileName = sanitize(fileName);
-    return {
-      song, artist,
-      cover: `${CONFIG.paths.images}${coverFile}`,
-      file: `${CONFIG.paths.songs}${safeFileName}.mp3`
-    };
-  };
-  const [musicDatabase] = useState({
-    sharedPlaylists: [...Array(10)].map((_, i) => createPlaylistData(
-      ["Discover Weekly", "Release Radar", "Daily Mix 1", "Time Capsule", "On Repeat", "Repeat Rewind", "Your Top Mix", "Chill Mix", "Focus Mix", "Energy Boost"][i],
-      ["Your weekly mixtape of fresh music", "Catch all the latest releases", "Made for your listening habits", "Songs from your past", "Songs you can't stop playing", "Your recent favorites", "Your most played tracks", "Your relaxing favorites", "Music to concentrate to", "Get pumped with these tracks"][i],
-      i + 1
-    )),
-    recentlyPlayed: [
-      createTrackData("Blinding Lights", "The Weeknd", "blinding-lights.jpg"),
-      createTrackData("Stay", "The Kid LAROI, Justin Bieber", "stay.jpg"),
-      createTrackData("good 4 u", "Olivia Rodrigo", "good-4-u.jpg"),
-      createTrackData("Levitating", "Dua Lipa", "levitating.jpg"),
-      createTrackData("Montero", "Lil Nas X", "montero.jpg"),
-      createTrackData("Peaches", "Justin Bieber", "peaches.jpg"),
-      createTrackData("Kiss Me More", "Doja Cat ft. SZA", "kiss-me-more.jpg"),
-      createTrackData("Butter", "BTS", "butter.jpg"),
-      createTrackData("Save Your Tears", "The Weeknd", "save-your-tears.jpg"),
-      createTrackData("Deja Vu", "Olivia Rodrigo", "deja-vu.jpg")
-    ],
-    get currentlyPlaying() { return this.recentlyPlayed[0]; }
-  });
+  const { musicDatabase, loading, error, searchMusic, refreshData, setMusicDatabase } = useMusicData();
+  
   const [playerState, setPlayerState] = useState({
     currentTrack: null,
     isPlaying: false,
     isDragging: false,
-    currentHue: CONFIG.defaultHue,
+    currentHue: 145,
     progress: 0,
     currentTime: '0:00',
     duration: '0:00'
   });
-  const [recentlyPlayed, setRecentlyPlayed] = useState(musicDatabase.recentlyPlayed);
-  const [nowPlaying, setNowPlaying] = useState(musicDatabase.currentlyPlaying);
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [recentlyPlayed, setRecentlyPlayed] = useState([]);
+  const [nowPlaying, setNowPlaying] = useState(null);
+  
   const audioRef = useRef(new Audio());
   const scrollContainersRef = useRef([]);
+  const searchTimeoutRef = useRef(null);
+
+  // Update local state when musicDatabase changes
+  useEffect(() => {
+    if (musicDatabase.recentlyPlayed.length > 0) {
+      setRecentlyPlayed(musicDatabase.recentlyPlayed);
+      setNowPlaying(musicDatabase.currentlyPlaying);
+    }
+  }, [musicDatabase]);
+
   const hslToHex = (h, s, l) => {
     h /= 360; s /= 100; l /= 100;
     const hue2rgb = (p, q, t) => {
@@ -74,17 +59,20 @@ function App() {
     };
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
   };
+
   const updateBackgroundColor = (hue) => {
     const hexColor = hslToHex(hue, 100, 50);
     const accentColor = hslToHex(hue, 80, 50);
     document.body.style.background = `linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, #000 100%), linear-gradient(0deg, ${hexColor} 0%, ${hexColor} 100%)`;
     document.documentElement.style.setProperty('--accent-color', accentColor);
   };
+
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
+
   const updateTimeDisplay = () => {
     const audio = audioRef.current;
     if (audio.duration && !isNaN(audio.duration)) {
@@ -95,6 +83,7 @@ function App() {
       }));
     }
   };
+
   const updatePlayBar = () => {
     const audio = audioRef.current;
     if (audio.duration && !isNaN(audio.duration)) {
@@ -103,16 +92,25 @@ function App() {
       updateTimeDisplay();
     }
   };
+
   const updateRecentlyPlayed = (track) => {
-    const updated = recentlyPlayed.filter(t => t.file !== track.file);
+    const updated = recentlyPlayed.filter(t => t.id !== track.id);
     updated.unshift(track);
     if (updated.length > 10) updated.pop();
     setRecentlyPlayed(updated);
     setNowPlaying(track);
   };
+
   const playTrack = (track) => {
     try {
       const audio = audioRef.current;
+      
+      // If no audio file available, show message
+      if (!track.file) {
+        alert("⚠️ Audio preview not available for this track. This is a demo using JioSaavn API.");
+        return;
+      }
+
       if (playerState.currentTrack === track.file) {
         if (playerState.isPlaying) {
           audio.pause();
@@ -123,6 +121,7 @@ function App() {
         }
         return;
       }
+
       audio.src = track.file;
       audio.play().then(() => {
         setPlayerState(prev => ({
@@ -136,12 +135,40 @@ function App() {
         updateRecentlyPlayed(track);
       }).catch((err) => {
         console.error("Playback failed:", err);
-        alert("⚠️ Failed to play this track. The audio file might be missing or blocked.");
+        alert("⚠️ Failed to play this track. Audio preview may not be available.");
       });
     } catch (error) {
       console.error("Audio error:", error);
     }
   };
+
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const results = await searchMusic(query);
+        setSearchResults(results);
+      } catch (error) {
+        console.error('Search error:', error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500);
+  };
+
   const handlePlayBarClick = (e) => {
     const audio = audioRef.current;
     if (!audio.duration) return;
@@ -156,25 +183,29 @@ function App() {
       setPlayerState(prev => ({ ...prev, isPlaying: true }));
     }
   };
+
   const handleHueChange = () => {
     const newHue = (playerState.currentHue + 30) % 360;
     setPlayerState(prev => ({ ...prev, currentHue: newHue }));
     updateBackgroundColor(newHue);
   };
+
   const handlePause = () => {
     audioRef.current.pause();
     setPlayerState(prev => ({ ...prev, isPlaying: false }));
   };
+
   const handlePlay = () => {
     if (playerState.currentTrack) {
       if (!playerState.isPlaying) {
         audioRef.current.play();
         setPlayerState(prev => ({ ...prev, isPlaying: true }));
       }
-    } else {
+    } else if (musicDatabase.currentlyPlaying) {
       playTrack(musicDatabase.currentlyPlaying);
     }
   };
+
   useEffect(() => {
     updateBackgroundColor(playerState.currentHue);
     const audio = audioRef.current;
@@ -182,6 +213,7 @@ function App() {
     audio.addEventListener('timeupdate', updatePlayBar);
     audio.addEventListener('loadedmetadata', updateTimeDisplay);
     audio.addEventListener('ended', handleEnded);
+
     const scrollContainers = document.querySelectorAll('.RecentlyPlayed, .Playlists');
     scrollContainersRef.current = scrollContainers;
     const handleWheel = function (e) {
@@ -191,12 +223,14 @@ function App() {
     scrollContainers.forEach(container => {
       container.addEventListener('wheel', handleWheel, { passive: false });
     });
+
     const handleTouchEnd = () => {
       setPlayerState(prev => ({ ...prev, isDragging: false }));
       const bar = document.querySelector('.PlayBar');
       if (bar) bar.style.setProperty('--playhead-opacity', '0');
     };
     document.addEventListener('touchend', handleTouchEnd);
+
     return () => {
       audio.pause();
       audio.removeEventListener('timeupdate', updatePlayBar);
@@ -206,8 +240,12 @@ function App() {
         container.removeEventListener('wheel', handleWheel);
       });
       document.removeEventListener('touchend', handleTouchEnd);
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
     };
   }, []);
+
   useEffect(() => {
     if (nowPlaying?.song && nowPlaying?.artist) {
       document.title = `${nowPlaying.song} · ${nowPlaying.artist}`;
@@ -215,6 +253,7 @@ function App() {
       document.title = 'Spotify Clone';
     }
   }, [nowPlaying]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.code === 'Space') {
@@ -227,6 +266,35 @@ function App() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [playerState.isPlaying]);
+
+  if (loading) {
+    return (
+      <div className="HomePage">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="HomePage">
+        <div style={{ padding: '20px', textAlign: 'center', color: 'white' }}>
+          <p>Error loading music data: {error}</p>
+          <button onClick={refreshData} style={{ 
+            padding: '10px 20px', 
+            background: 'var(--accent-color)', 
+            border: 'none', 
+            borderRadius: '5px',
+            color: 'black',
+            cursor: 'pointer'
+          }}>
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="HomePage">
       <div className="Top">
@@ -236,23 +304,31 @@ function App() {
               type="text"
               className="SearchInput"
               placeholder="What do you want to play?"
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
             />
             <div className="SearchIconFrame">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width={20}
-                height={21}
-                viewBox="0 0 20 21"
-                fill="none"
-              >
-                <path
-                  d="M14.415 14.8043C15.7989 13.3927 16.6522 11.4591 16.6522 9.32609C16.6522 5.00386 13.1483 1.5 8.82609 1.5C4.50386 1.5 1 5.00386 1 9.32609C1 13.6483 4.50386 17.1522 8.82609 17.1522C11.0154 17.1522 12.9947 16.2532 14.415 14.8043ZM14.415 14.8043L19 19.5"
-                  stroke="#898989"
-                  strokeOpacity="0.5"
-                  strokeWidth="1.77054"
-                  strokeLinecap="round"
-                />
-              </svg>
+              {isSearching ? (
+                <div style={{ width: '20px', height: '20px' }}>
+                  <LoadingSpinner />
+                </div>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width={20}
+                  height={21}
+                  viewBox="0 0 20 21"
+                  fill="none"
+                >
+                  <path
+                    d="M14.415 14.8043C15.7989 13.3927 16.6522 11.4591 16.6522 9.32609C16.6522 5.00386 13.1483 1.5 8.82609 1.5C4.50386 1.5 1 5.00386 1 9.32609C1 13.6483 4.50386 17.1522 8.82609 17.1522C11.0154 17.1522 12.9947 16.2532 14.415 14.8043ZM14.415 14.8043L19 19.5"
+                    stroke="#898989"
+                    strokeOpacity="0.5"
+                    strokeWidth="1.77054"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              )}
             </div>
           </div>
           <div className="FilterFrame">
@@ -303,17 +379,28 @@ function App() {
               </svg>
             </div>
           </div>
-          <div className="RecentlyPlayed" id="recentlyPlayed">
-            {recentlyPlayed.map(track => (
-              <Album
-                key={track.file}
-                track={track}
-                isPlaying={playerState.currentTrack === track.file && playerState.isPlaying}
-                onClick={() => playTrack(track)}
-              />
-            ))}
-          </div>
+
+          {searchResults.length > 0 ? (
+            <SearchResults 
+              results={searchResults}
+              onTrackPlay={playTrack}
+              currentTrack={playerState.currentTrack}
+              isPlaying={playerState.isPlaying}
+            />
+          ) : (
+            <div className="RecentlyPlayed" id="recentlyPlayed">
+              {recentlyPlayed.map(track => (
+                <Album
+                  key={track.id}
+                  track={track}
+                  isPlaying={playerState.currentTrack === track.file && playerState.isPlaying}
+                  onClick={() => playTrack(track)}
+                />
+              ))}
+            </div>
+          )}
         </div>
+        
         <div className="Middle">
           <div className="PlaylistType">
             <div className="MadeForYouFrame">
@@ -343,10 +430,11 @@ function App() {
             </div>
             <div className="Playlists" id="madeForYouPlaylists">
               {musicDatabase.sharedPlaylists.map(playlist => (
-                <Playlist key={playlist.name} playlist={playlist} />
+                <Playlist key={playlist.id} playlist={playlist} />
               ))}
             </div>
           </div>
+          
           <div className="PlaylistType">
             <div className="MadeForYouFrame">
               Popular Playlists
@@ -374,11 +462,12 @@ function App() {
               </div>
             </div>
             <div className="Playlists" id="popularPlaylists">
-              {musicDatabase.sharedPlaylists.map(playlist => (
-                <Playlist key={`popular-${playlist.name}`} playlist={playlist} />
+              {musicDatabase.popularPlaylists.map(playlist => (
+                <Playlist key={`popular-${playlist.id}`} playlist={playlist} />
               ))}
             </div>
           </div>
+          
           <div className="PlaylistType">
             <div className="MadeForYouFrame">
               Recommended
@@ -406,13 +495,19 @@ function App() {
               </div>
             </div>
             <div className="Playlists" id="recommendedPlaylists">
-              {musicDatabase.sharedPlaylists.map(playlist => (
-                <Playlist key={`recommended-${playlist.name}`} playlist={playlist} />
+              {musicDatabase.recommendedSongs.map(track => (
+                <Album
+                  key={`recommended-${track.id}`}
+                  track={track}
+                  isPlaying={playerState.currentTrack === track.file && playerState.isPlaying}
+                  onClick={() => playTrack(track)}
+                />
               ))}
             </div>
           </div>
         </div>
       </div>
+      
       <div className="Bottom">
         <div className="PlayerFrame">
           <div className="Player Desktop">
@@ -746,4 +841,5 @@ function App() {
     </div>
   );
 }
+
 export default App;
