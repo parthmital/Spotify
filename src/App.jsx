@@ -144,6 +144,7 @@ function App() {
   };
 
   const handleSearch = async (query) => {
+    console.log('Search triggered with query:', query);
     setSearchQuery(query);
     
     if (searchTimeoutRef.current) {
@@ -151,17 +152,22 @@ function App() {
     }
 
     if (!query.trim()) {
+      console.log('Empty query, clearing results');
       setSearchResults([]);
       setHasSearched(false);
+      setIsSearching(false);
       return;
     }
 
+    console.log('Setting search state...');
     setIsSearching(true);
     setHasSearched(true);
     
     searchTimeoutRef.current = setTimeout(async () => {
       try {
+        console.log('Executing search for:', query);
         const results = await searchMusic(query);
+        console.log('Search completed, results:', results);
         setSearchResults(results);
       } catch (error) {
         console.error('Search error:', error);
@@ -207,6 +213,14 @@ function App() {
     } else if (musicDatabase.currentlyPlaying) {
       playTrack(musicDatabase.currentlyPlaying);
     }
+  };
+
+  const clearSearch = () => {
+    console.log('Clearing search');
+    setSearchQuery('');
+    setSearchResults([]);
+    setHasSearched(false);
+    setIsSearching(false);
   };
 
   useEffect(() => {
@@ -270,6 +284,17 @@ function App() {
     };
   }, [playerState.isPlaying]);
 
+  // Debug logging
+  useEffect(() => {
+    console.log('App state update:', {
+      searchQuery,
+      hasSearched,
+      isSearching,
+      searchResultsCount: searchResults.length,
+      recentlyPlayedCount: recentlyPlayed.length
+    });
+  }, [searchQuery, hasSearched, isSearching, searchResults.length, recentlyPlayed.length]);
+
   if (loading) {
     return (
       <div className="HomePage">
@@ -315,6 +340,24 @@ function App() {
                 <div style={{ width: '20px', height: '20px' }}>
                   <LoadingSpinner />
                 </div>
+              ) : searchQuery ? (
+                <button 
+                  onClick={clearSearch}
+                  style={{ 
+                    background: 'none', 
+                    border: 'none', 
+                    color: '#898989', 
+                    cursor: 'pointer',
+                    padding: '0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 8.586L2.929 1.515 1.515 2.929 8.586 10l-7.071 7.071 1.414 1.414L10 11.414l7.071 7.071 1.414-1.414L11.414 10l7.071-7.071-1.414-1.414L10 8.586z"/>
+                  </svg>
+                </button>
               ) : (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

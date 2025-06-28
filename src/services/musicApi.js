@@ -63,7 +63,7 @@ class MusicApiService {
       }
       
       const data = await response.json();
-      console.log('API Response:', data);
+      console.log('API Response received, data keys:', Object.keys(data));
       return data;
       
     } catch (error) {
@@ -74,23 +74,40 @@ class MusicApiService {
 
   async searchSongs(query, limit = 10) {
     try {
+      console.log(`Searching for songs: "${query}"`);
       const endpoint = `/search/songs?query=${encodeURIComponent(query)}&page=1&limit=${limit}`;
       const data = await this.makeRequest(endpoint);
+      
+      console.log('Search response structure:', {
+        hasData: !!data.data,
+        hasResults: !!data.results,
+        isArray: Array.isArray(data),
+        keys: Object.keys(data)
+      });
       
       // Handle different response structures
       let songs = [];
       if (data.data?.results) {
         songs = data.data.results;
+        console.log('Found songs in data.results');
       } else if (data.results) {
         songs = data.results;
+        console.log('Found songs in results');
       } else if (Array.isArray(data.data)) {
         songs = data.data;
+        console.log('Found songs in data array');
       } else if (Array.isArray(data)) {
         songs = data;
+        console.log('Found songs in root array');
+      } else {
+        console.log('No songs found in response structure');
       }
       
-      console.log('Search songs found:', songs.length);
-      return this.transformSongsData(songs);
+      console.log(`Raw songs found: ${songs.length}`);
+      const transformedSongs = this.transformSongsData(songs);
+      console.log(`Transformed songs: ${transformedSongs.length}`);
+      
+      return transformedSongs;
     } catch (error) {
       console.error('Error searching songs:', error);
       return [];
@@ -176,12 +193,14 @@ class MusicApiService {
       return [];
     }
 
-    return songs.map((song, index) => {
+    console.log(`Transforming ${songs.length} songs`);
+    
+    const transformed = songs.map((song, index) => {
       try {
         const songName = this.cleanText(song.name || song.title || song.song || 'Unknown Song');
         const artistName = this.extractArtists(song.primaryArtists || song.artists || song.artist || song.singers);
         
-        return {
+        const result = {
           id: song.id || `song-${Date.now()}-${index}`,
           song: songName,
           artist: artistName,
@@ -191,11 +210,17 @@ class MusicApiService {
           year: song.year || new Date().getFullYear(),
           album: this.cleanText(song.album?.name || song.album || 'Unknown Album')
         };
+        
+        console.log(`Transformed song: ${result.song} by ${result.artist}, has audio: ${!!result.file}`);
+        return result;
       } catch (error) {
         console.error('Error transforming song:', song, error);
         return null;
       }
     }).filter(Boolean);
+    
+    console.log(`Successfully transformed ${transformed.length} songs`);
+    return transformed;
   }
 
   transformPlaylistsData(playlists) {
@@ -266,15 +291,23 @@ class MusicApiService {
                              urlField[0];
           
           if (highQuality) {
-            return highQuality.link || highQuality.url || highQuality;
+            const audioUrl = highQuality.link || highQuality.url || highQuality;
+            console.log('Found audio URL:', audioUrl);
+            return audioUrl;
           }
         } else if (typeof urlField === 'string') {
+          console.log('Found audio URL (string):', urlField);
           return urlField;
         } else if (urlField && typeof urlField === 'object') {
-          return urlField.link || urlField.url || '';
+          const audioUrl = urlField.link || urlField.url || '';
+          if (audioUrl) {
+            console.log('Found audio URL (object):', audioUrl);
+            return audioUrl;
+          }
         }
       }
       
+      console.log('No audio URL found for song:', song.name || song.title);
       return ''; // No audio URL available
     } catch (error) {
       console.error('Error extracting audio URL:', error);
@@ -297,10 +330,10 @@ class MusicApiService {
 
   cleanText(text) {
     if (!text) return '';
-    return text.replace(/&quot;/g, '"')
-               .replace(/&amp;/g, '&')
-               .replace(/&lt;/g, '<')
-               .replace(/&gt;/g, '>')
+    return text.replace(/"/g, '"')
+               .replace(/&/g, '&')
+               .replace(/</g, '<')
+               .replace(/>/g, '>')
                .replace(/&#39;/g, "'")
                .replace(/&nbsp;/g, ' ')
                .trim();
