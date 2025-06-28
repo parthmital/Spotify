@@ -23,6 +23,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [recentlyPlayed, setRecentlyPlayed] = useState([]);
   const [nowPlaying, setNowPlaying] = useState(null);
   
@@ -151,10 +152,12 @@ function App() {
 
     if (!query.trim()) {
       setSearchResults([]);
+      setHasSearched(false);
       return;
     }
 
     setIsSearching(true);
+    setHasSearched(true);
     
     searchTimeoutRef.current = setTimeout(async () => {
       try {
@@ -380,12 +383,15 @@ function App() {
             </div>
           </div>
 
-          {searchResults.length > 0 ? (
+          {/* Show search results when user has searched, otherwise show recently played */}
+          {hasSearched ? (
             <SearchResults 
               results={searchResults}
               onTrackPlay={playTrack}
               currentTrack={playerState.currentTrack}
               isPlaying={playerState.isPlaying}
+              isSearching={isSearching}
+              searchQuery={searchQuery}
             />
           ) : (
             <div className="RecentlyPlayed" id="recentlyPlayed">
