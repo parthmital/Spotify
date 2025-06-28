@@ -20,18 +20,10 @@ export const useMusicData = () => {
 
       console.log('Loading initial music data...');
 
-      // Load data with individual error handling
-      const results = await Promise.allSettled([
-        musicApi.getTopSongs(10),
-        musicApi.getPopularPlaylists(10),
-        musicApi.getRecommendedSongs(10)
-      ]);
-
-      const [topSongsResult, playlistsResult, recommendedResult] = results;
-
-      const topSongs = topSongsResult.status === 'fulfilled' ? topSongsResult.value : musicApi.getFallbackSongs();
-      const playlists = playlistsResult.status === 'fulfilled' ? playlistsResult.value : musicApi.getFallbackPlaylists();
-      const recommended = recommendedResult.status === 'fulfilled' ? recommendedResult.value : musicApi.getFallbackSongs();
+      // Load data sequentially to avoid overwhelming the API
+      const topSongs = await musicApi.getTopSongs(10);
+      const playlists = await musicApi.getPopularPlaylists(10);
+      const recommended = await musicApi.getRecommendedSongs(10);
 
       console.log('Loaded data:', { topSongs, playlists, recommended });
 
@@ -43,25 +35,9 @@ export const useMusicData = () => {
         currentlyPlaying: topSongs[0] || null
       });
 
-      // Show warning if any API calls failed
-      const failedCalls = results.filter(result => result.status === 'rejected');
-      if (failedCalls.length > 0) {
-        console.warn(`${failedCalls.length} API calls failed, using fallback data`);
-        setError(`Some content may be limited due to API connectivity issues`);
-      }
-
     } catch (err) {
       console.error('Error loading music data:', err);
-      setError('Failed to load music data. Using demo content.');
-      
-      // Use fallback data
-      setMusicDatabase({
-        sharedPlaylists: musicApi.getFallbackPlaylists(),
-        recentlyPlayed: musicApi.getFallbackSongs(),
-        recommendedSongs: musicApi.getFallbackSongs(),
-        popularPlaylists: musicApi.getFallbackPlaylists(),
-        currentlyPlaying: musicApi.getFallbackSongs()[0]
-      });
+      setError('Failed to load music data from JioSaavn API');
     } finally {
       setLoading(false);
     }
@@ -78,7 +54,7 @@ export const useMusicData = () => {
       return results;
     } catch (err) {
       console.error('Error searching music:', err);
-      return musicApi.getFallbackSearchResults(query);
+      return [];
     }
   };
 
