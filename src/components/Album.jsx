@@ -1,7 +1,8 @@
 const Album = ({ track, isPlaying, onClick }) => {
   const handleClick = () => {
     if (!track.file) {
-      alert("⚠️ Audio preview not available for this track. This is a demo using JioSaavn API which may have limited audio access.");
+      console.log('No audio file available for track:', track);
+      alert("⚠️ Audio preview not available for this track. JioSaavn API has limited audio access due to licensing restrictions.");
       return;
     }
     onClick();
@@ -13,10 +14,18 @@ const Album = ({ track, isPlaying, onClick }) => {
       data-file={track.file}
       onClick={handleClick}
     >
-      <div className="AlbumCover" style={{ backgroundImage: `url('${track.cover}')` }} />
+      <div 
+        className="AlbumCover" 
+        style={{ 
+          backgroundImage: `url('${track.cover}')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }} 
+      />
       <div className="AlbumDescription">
-        <div className="AlbumName">{track.song}</div>
-        <div className="AlbumArtist">{track.artist}</div>
+        <div className="AlbumName" title={track.song}>{track.song}</div>
+        <div className="AlbumArtist" title={track.artist}>{track.artist}</div>
       </div>
       <div className="PlayButton">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="17" viewBox="0 0 14 17" fill="none">

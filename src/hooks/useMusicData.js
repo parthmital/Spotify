@@ -20,24 +20,44 @@ export const useMusicData = () => {
 
       console.log('Loading initial music data...');
 
-      // Load data sequentially to avoid overwhelming the API
+      // Load data with delays to avoid rate limiting
       const topSongs = await musicApi.getTopSongs(10);
+      console.log('Top songs loaded:', topSongs.length);
+      
+      // Small delay between requests
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       const playlists = await musicApi.getPopularPlaylists(10);
+      console.log('Playlists loaded:', playlists.length);
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       const recommended = await musicApi.getRecommendedSongs(10);
+      console.log('Recommended loaded:', recommended.length);
 
-      console.log('Loaded data:', { topSongs, playlists, recommended });
-
-      setMusicDatabase({
+      const newDatabase = {
         sharedPlaylists: playlists,
         recentlyPlayed: topSongs,
         recommendedSongs: recommended,
         popularPlaylists: playlists,
         currentlyPlaying: topSongs[0] || null
-      });
+      };
+
+      console.log('Final database:', newDatabase);
+      setMusicDatabase(newDatabase);
 
     } catch (err) {
       console.error('Error loading music data:', err);
-      setError('Failed to load music data from JioSaavn API');
+      setError(`Failed to load music data: ${err.message}`);
+      
+      // Set fallback data
+      setMusicDatabase({
+        sharedPlaylists: [],
+        recentlyPlayed: [],
+        recommendedSongs: [],
+        popularPlaylists: [],
+        currentlyPlaying: null
+      });
     } finally {
       setLoading(false);
     }
@@ -49,12 +69,12 @@ export const useMusicData = () => {
       
       console.log(`Searching for: ${query}`);
       const results = await musicApi.searchSongs(query, 20);
-      console.log(`Search results:`, results);
+      console.log(`Search results:`, results.length, 'songs found');
       
       return results;
     } catch (err) {
       console.error('Error searching music:', err);
-      return [];
+      throw err;
     }
   };
 

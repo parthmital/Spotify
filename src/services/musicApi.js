@@ -1,18 +1,60 @@
-const JIOSAAVN_API_BASE = 'https://jiosaavn-api-2-harsh-patel.vercel.app';
+// Try multiple JioSaavn API endpoints to find working one
+const API_ENDPOINTS = [
+  'https://jiosaavn-api-2-harsh-patel.vercel.app',
+  'https://saavn.me',
+  'https://jiosaavn-api.vercel.app',
+  'https://jiosaavn-harsh-patel.vercel.app'
+];
 
 class MusicApiService {
   constructor() {
-    this.currentApiBase = JIOSAAVN_API_BASE;
+    this.currentApiBase = API_ENDPOINTS[0];
+    this.workingEndpoint = null;
+  }
+
+  async findWorkingEndpoint() {
+    if (this.workingEndpoint) {
+      return this.workingEndpoint;
+    }
+
+    for (const endpoint of API_ENDPOINTS) {
+      try {
+        console.log(`Testing endpoint: ${endpoint}`);
+        const response = await fetch(`${endpoint}/modules?language=hindi`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+        
+        if (response.ok) {
+          console.log(`Working endpoint found: ${endpoint}`);
+          this.workingEndpoint = endpoint;
+          this.currentApiBase = endpoint;
+          return endpoint;
+        }
+      } catch (error) {
+        console.log(`Endpoint ${endpoint} failed:`, error.message);
+        continue;
+      }
+    }
+    
+    throw new Error('No working JioSaavn API endpoint found');
   }
 
   async makeRequest(endpoint) {
     try {
-      console.log(`Making request to: ${this.currentApiBase}${endpoint}`);
+      // Ensure we have a working endpoint
+      await this.findWorkingEndpoint();
       
-      const response = await fetch(`${this.currentApiBase}${endpoint}`, {
+      const url = `${this.currentApiBase}${endpoint}`;
+      console.log(`Making request to: ${url}`);
+      
+      const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
+          'Content-Type': 'application/json',
         },
       });
       
@@ -35,8 +77,19 @@ class MusicApiService {
       const endpoint = `/search/songs?query=${encodeURIComponent(query)}&page=1&limit=${limit}`;
       const data = await this.makeRequest(endpoint);
       
-      // JioSaavn API returns data in data.results format
-      const songs = data.data?.results || [];
+      // Handle different response structures
+      let songs = [];
+      if (data.data?.results) {
+        songs = data.data.results;
+      } else if (data.results) {
+        songs = data.results;
+      } else if (Array.isArray(data.data)) {
+        songs = data.data;
+      } else if (Array.isArray(data)) {
+        songs = data;
+      }
+      
+      console.log('Search songs found:', songs.length);
       return this.transformSongsData(songs);
     } catch (error) {
       console.error('Error searching songs:', error);
@@ -46,23 +99,42 @@ class MusicApiService {
 
   async getTopSongs(limit = 10) {
     try {
-      // Use trending endpoint
-      const endpoint = `/modules?language=hindi`;
-      const data = await this.makeRequest(endpoint);
-      
-      // Extract songs from trending modules
-      let songs = [];
-      if (data.data?.trending) {
-        songs = data.data.trending.slice(0, limit);
-      } else if (data.data?.charts) {
-        songs = data.data.charts.slice(0, limit);
+      // Try different endpoints for trending songs
+      let data;
+      try {
+        data = await this.makeRequest('/modules?language=hindi');
+      } catch (error) {
+        console.log('Modules endpoint failed, trying search fallback');
+        return this.searchSongs('bollywood hits 2024', limit);
       }
       
-      return this.transformSongsData(songs);
+      let songs = [];
+      
+      // Extract songs from different possible structures
+      if (data.data) {
+        if (data.data.trending?.songs) {
+          songs = data.data.trending.songs;
+        } else if (data.data.charts) {
+          songs = data.data.charts;
+        } else if (data.data.albums) {
+          // Get songs from first album
+          const firstAlbum = data.data.albums[0];
+          if (firstAlbum?.songs) {
+            songs = firstAlbum.songs;
+          }
+        }
+      }
+      
+      if (songs.length === 0) {
+        console.log('No trending songs found, using search fallback');
+        return this.searchSongs('hindi songs 2024', limit);
+      }
+      
+      console.log('Top songs found:', songs.length);
+      return this.transformSongsData(songs.slice(0, limit));
     } catch (error) {
       console.error('Error fetching top songs:', error);
-      // Fallback to search
-      return this.searchSongs('hindi hits', limit);
+      return this.searchSongs('bollywood hits', limit);
     }
   }
 
@@ -71,17 +143,27 @@ class MusicApiService {
       const endpoint = `/search/playlists?query=bollywood&page=1&limit=${limit}`;
       const data = await this.makeRequest(endpoint);
       
-      const playlists = data.data?.results || [];
+      let playlists = [];
+      if (data.data?.results) {
+        playlists = data.data.results;
+      } else if (data.results) {
+        playlists = data.results;
+      } else if (Array.isArray(data.data)) {
+        playlists = data.data;
+      }
+      
+      console.log('Playlists found:', playlists.length);
       return this.transformPlaylistsData(playlists);
     } catch (error) {
       console.error('Error fetching playlists:', error);
-      return [];
+      // Return mock playlists if API fails
+      return this.getMockPlaylists();
     }
   }
 
   async getRecommendedSongs(limit = 10) {
     try {
-      return this.searchSongs('latest hindi songs', limit);
+      return this.searchSongs('latest bollywood songs', limit);
     } catch (error) {
       console.error('Error fetching recommended songs:', error);
       return [];
@@ -96,15 +178,18 @@ class MusicApiService {
 
     return songs.map((song, index) => {
       try {
+        const songName = this.cleanText(song.name || song.title || song.song || 'Unknown Song');
+        const artistName = this.extractArtists(song.primaryArtists || song.artists || song.artist || song.singers);
+        
         return {
-          id: song.id || `song-${index}`,
-          song: this.cleanText(song.name || song.title || 'Unknown Song'),
-          artist: this.extractArtists(song.primaryArtists || song.artists || song.artist),
+          id: song.id || `song-${Date.now()}-${index}`,
+          song: songName,
+          artist: artistName,
           cover: this.getBestImageQuality(song.image),
           file: this.extractAudioUrl(song),
           duration: this.formatDuration(song.duration),
           year: song.year || new Date().getFullYear(),
-          album: this.cleanText(song.album?.name || 'Unknown Album')
+          album: this.cleanText(song.album?.name || song.album || 'Unknown Album')
         };
       } catch (error) {
         console.error('Error transforming song:', song, error);
@@ -120,27 +205,36 @@ class MusicApiService {
     }
 
     return playlists.map((playlist, index) => ({
-      id: playlist.id || `playlist-${index}`,
+      id: playlist.id || `playlist-${Date.now()}-${index}`,
       name: this.cleanText(playlist.name || playlist.title || 'Unknown Playlist'),
-      info: `${playlist.songCount || playlist.song_count || 0} songs`,
+      info: `${playlist.songCount || playlist.song_count || playlist.songs?.length || 0} songs`,
       cover: this.getBestImageQuality(playlist.image),
-      songCount: playlist.songCount || playlist.song_count || 0
+      songCount: playlist.songCount || playlist.song_count || playlist.songs?.length || 0
     }));
   }
 
   extractArtists(artistsData) {
     try {
+      if (!artistsData) return 'Unknown Artist';
+      
       if (typeof artistsData === 'string') {
         return this.cleanText(artistsData);
       }
+      
       if (Array.isArray(artistsData)) {
-        return artistsData.map(artist => 
-          this.cleanText(typeof artist === 'string' ? artist : artist.name || 'Unknown')
-        ).join(', ');
+        return artistsData.map(artist => {
+          if (typeof artist === 'string') return this.cleanText(artist);
+          if (artist && typeof artist === 'object') {
+            return this.cleanText(artist.name || artist.title || 'Unknown');
+          }
+          return 'Unknown';
+        }).join(', ');
       }
+      
       if (artistsData && typeof artistsData === 'object') {
-        return this.cleanText(artistsData.name || 'Unknown Artist');
+        return this.cleanText(artistsData.name || artistsData.title || 'Unknown Artist');
       }
+      
       return 'Unknown Artist';
     } catch (error) {
       console.error('Error extracting artists:', error);
@@ -150,23 +244,36 @@ class MusicApiService {
 
   extractAudioUrl(song) {
     try {
-      // JioSaavn API structure for download URLs
-      if (song.downloadUrl) {
-        if (Array.isArray(song.downloadUrl)) {
+      // Try different possible audio URL fields
+      const possibleUrls = [
+        song.downloadUrl,
+        song.download_url,
+        song.media_preview_url,
+        song.preview_url,
+        song.stream_url,
+        song.url,
+        song.link
+      ];
+
+      for (const urlField of possibleUrls) {
+        if (!urlField) continue;
+        
+        if (Array.isArray(urlField)) {
           // Get highest quality available
-          const highQuality = song.downloadUrl.find(url => url.quality === '320kbps') ||
-                             song.downloadUrl.find(url => url.quality === '160kbps') ||
-                             song.downloadUrl.find(url => url.quality === '96kbps') ||
-                             song.downloadUrl[0];
-          return highQuality?.link || highQuality?.url || '';
+          const highQuality = urlField.find(url => url.quality === '320kbps') ||
+                             urlField.find(url => url.quality === '160kbps') ||
+                             urlField.find(url => url.quality === '96kbps') ||
+                             urlField[0];
+          
+          if (highQuality) {
+            return highQuality.link || highQuality.url || highQuality;
+          }
+        } else if (typeof urlField === 'string') {
+          return urlField;
+        } else if (urlField && typeof urlField === 'object') {
+          return urlField.link || urlField.url || '';
         }
-        return song.downloadUrl;
       }
-      
-      // Alternative URL fields
-      if (song.media_preview_url) return song.media_preview_url;
-      if (song.preview_url) return song.preview_url;
-      if (song.stream_url) return song.stream_url;
       
       return ''; // No audio URL available
     } catch (error) {
@@ -195,6 +302,7 @@ class MusicApiService {
                .replace(/&lt;/g, '<')
                .replace(/&gt;/g, '>')
                .replace(/&#39;/g, "'")
+               .replace(/&nbsp;/g, ' ')
                .trim();
   }
 
@@ -205,7 +313,8 @@ class MusicApiService {
       // JioSaavn images come in different qualities, get the highest
       return imageUrl.replace('150x150', '500x500')
                      .replace('50x50', '500x500')
-                     .replace('_150.jpg', '_500.jpg');
+                     .replace('_150.jpg', '_500.jpg')
+                     .replace('_150.webp', '_500.webp');
     } catch (error) {
       return this.getPlaceholderImage();
     }
@@ -213,6 +322,32 @@ class MusicApiService {
 
   getPlaceholderImage() {
     return 'https://via.placeholder.com/300x300/1ed760/000000?text=♪';
+  }
+
+  getMockPlaylists() {
+    return [
+      {
+        id: 'mock-1',
+        name: 'Bollywood Hits',
+        info: '50 songs',
+        cover: this.getPlaceholderImage(),
+        songCount: 50
+      },
+      {
+        id: 'mock-2',
+        name: 'Latest Hindi Songs',
+        info: '30 songs',
+        cover: this.getPlaceholderImage(),
+        songCount: 30
+      },
+      {
+        id: 'mock-3',
+        name: 'Romantic Songs',
+        info: '40 songs',
+        cover: this.getPlaceholderImage(),
+        songCount: 40
+      }
+    ];
   }
 }
 
