@@ -5,7 +5,7 @@ A modern, responsive music player web app inspired by Spotify. Built with React 
 ## Features
 - 🎵 Browse and play a curated set of songs and playlists
 - 🕒 Recently played and currently playing track management
-- 🎨 Customizable accent color (hue slider)
+- 🎨 Customizable accent color
 - 💻 Responsive design and smooth UI interactions
 - 🅰️ Custom "Spotify Mix" font family for authentic look
 
